@@ -12,7 +12,18 @@ import javafx.scene.text.Font;
 /**
  * @author Evelyn Welch
  * 
- *         This is the main entry point for the program
+ * This is the main entry point for the program
+ *         
+ * TODO: Figure out how to make deleting a column more elegant
+ * TODO: make it so you can add and delete elements from table
+ * TODO: Make it display a graph
+ * TODO: figure out what to say here 
+ * TODO: Make it so if you change the name of a key value, it will go through all of the maps and update them. 
+ * TODO: Make keyCount and keyNames update correctly.
+ * TODO: add the ability to write data to file.
+ * TODO: Make it correctly handle keyNames so they stay in sync.
+ * TODO: add data import and export
+ * TODO: make the table editable.
  */
 
 public class App extends Application {
@@ -33,13 +44,9 @@ public class App extends Application {
 
 		DataTable table = new DataTable();
 
-		final VBox vbox = new VBox();
 
-		vbox.setSpacing(5);
-		vbox.setPadding(new Insets(10, 0, 0, 10));
-		vbox.getChildren().addAll(label, table.getTable());
 
-		((Group) scene.getRoot()).getChildren().addAll(vbox);
+		((Group) scene.getRoot()).getChildren().addAll(table.getTableContainer());
 
 		stage.setScene(scene);
 

@@ -1,19 +1,31 @@
 package GraphMaker;
 
+import java.util.HashMap;
 import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.MapValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
+import javafx.scene.input.MouseEvent;
 
 /**
- * DataTable creates a JavaFX TableView, and manages its associated data with DataHandler.
+ * DataTable creates a JavaFX TableView, and manages its associated data with
+ * DataHandler.
  */
 public class DataTable {
 	TableView table;
 	DataHandler data;
 	ObservableList<TableColumn> columns;
+	VBox tableContainer;
 
 	public DataTable() {
 		this.data = new DataHandler();
@@ -27,17 +39,84 @@ public class DataTable {
 		this.table = new TableView<>(this.data.data);
 		this.table.setEditable(true);
 
-		this.columns = tableColumnFactory();
-		System.out.println("columns size(): " + this.columns.size());
-		this.table.getColumns().addAll(columns);
+		table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		table.getSelectionModel().setCellSelectionEnabled(true);
 
-		System.out.println("table.getColumns().size(): " + this.table.getColumns().size());
+		// creates columns from DataHandler.keyNames
+		tableColumnFactory();
 
+		// Add a new column functionality
+		TextArea taAddColumn = new TextArea();
+		Button btAddColumn = new Button("add column");
+		btAddColumn.setOnAction(e -> {
+			String columnName = taAddColumn.getText();
+			if (columnName != "") {
+				this.addColumn(columnName);
+				taAddColumn.setText("");
+				System.out.println(this.data.getKeyNames());
+			}
+		});
+		HBox addColumnHBox = new HBox();
+		addColumnHBox.getChildren().addAll(taAddColumn, btAddColumn);
+		
+		// Delete column functionality
+		// NOTE: this needs to be changed so you can select a column and delete it, not put the name in and hit the delete button
+		TextArea deleteColumnTa = new TextArea("test0");
+		Button deleteColumnBt = new Button("delete col");
+		deleteColumnBt.setOnAction(e -> {
+			// get the String from the text area
+			String toDelete = deleteColumnTa.getText();
+			this.data.removeKey(toDelete);
+			deleteColumnTa.setText("");
+			TableColumn<Map, String> td = null;
+			ObservableList<TableColumn> columns = this.table.getColumns();
+			// loop through the columns looking for one thats text matches toDelete
+			for(TableColumn c :  columns) {
+				if(c.getText().equals(toDelete)) {
+					td = c;
+					break;
+				}
+			}
+			// remove the column from columns
+			columns.remove(td);
+			
+		});
+		HBox deleteColumnHBox = new HBox();
+		deleteColumnHBox.getChildren().addAll(deleteColumnTa, deleteColumnBt);
+		
+		
+		// Add row functionality
+		Button addRowBt = new Button("Add row");
+		addRowBt.setOnAction(e -> {
+			this.addRow();
+		});
+		HBox addRowHBox = new HBox();
+		
+		// delete row functionality
+		Button deleteRowBt = new Button("delete row");
+		deleteRowBt.setOnAction(e -> {
+			this.data.data.remove(this.table.getSelectionModel().getSelectedItem());
+		});
+		addRowHBox.getChildren().addAll(addRowBt, deleteRowBt);
+		
+		
+		
+		
+		
+		
+		tableContainer = new VBox();
+		tableContainer.setSpacing(5);
+		tableContainer.setPadding(new Insets(10, 0, 0, 10));
+		tableContainer.getChildren().addAll(this.getTable(), addColumnHBox, addRowHBox, deleteColumnHBox);
 	}
 
 	public DataTable(TableView table, DataHandler data) {
 		this.table = table;
 		this.data = data;
+	}
+
+	public VBox getTableContainer() {
+		return this.tableContainer;
 	}
 
 	public TableView getTable() {
@@ -57,26 +136,40 @@ public class DataTable {
 	}
 
 	/**
-	 * Creates an array list of TableColumns based the data key length of the stored
-	 * data in DataHandler
+	 * Creates a new column with the name of string
 	 * 
-	 * @return ArrayList<TableColumn>
+	 * @param key - the name of the column / the value it is stored in the map
 	 */
-	private ObservableList<TableColumn> tableColumnFactory() {
+	public void addColumn(String key) {
+		this.data.addKeyName(key);
+		TableColumn<Map, String> newColumn = new TableColumn<>(key);
+		newColumn.setCellValueFactory(new MapValueFactory<String>(key));
 
-		ObservableList<TableColumn> tableColumns = FXCollections.observableArrayList();
+		EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+				System.out.println("Hello World");
+			}
+		};
+
+		newColumn.addEventHandler(MouseEvent.MOUSE_MOVED, eventHandler);
+		this.table.getColumns().add(newColumn);
+	}
+
+	/**
+	 * runs addColumn on all DataHandler.keyNames
+	 */
+	private void tableColumnFactory() {
 		// gets the keyNames from DataHandler
 		ObservableList<String> keyNames = this.data.getKeyNames();
-
-		// loop through KeyNames and make all of the columns
+		// loop through keyNames and make all of the columns
 		for (int i = 0; i < keyNames.size(); i++) {
-			TableColumn<Map, String> column = new TableColumn<>(keyNames.get(i));
-//			column.setCellValueFactory(new MapValueFactory<String>(keyNames.get(i)));
-			column.setCellValueFactory(new MapValueFactory<String>(keyNames.get(i)));
-
-			tableColumns.add(column);
+			addColumn(keyNames.get(i));
 		}
+	}
 
-		return tableColumns;
+	/** Adds a new Map to DataHandler.data */
+	private void addRow() {
+		this.data.addRow();
 	}
 }

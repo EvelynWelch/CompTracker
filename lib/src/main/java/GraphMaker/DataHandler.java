@@ -6,17 +6,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.FXCollections;
 
 /**
- * TODO: figure out what to say here TODO: Make it so if you change the name of
- * a key value, it will go through all of the maps and update them. TODO: Make
- * keyCount and keyNames update correctly.
- * 
- * 
  * Manages the data to be displayed in the table.
- * 
- * TODO: add the ability to write data to file.
- * TODO: Make it correctly handle keyNames so they stay in sync.
- * 
- * 
  */
 public class DataHandler {
 	ObservableList<HashMap<String, String>> data;
@@ -73,7 +63,7 @@ public class DataHandler {
 	public String getProperty(int index, String key) {
 		return this.data.get(index).get(key);
 	}
-
+	
 	/**
 	 * assigns value to key at index
 	 * 
@@ -113,6 +103,45 @@ public class DataHandler {
 			return -1;
 		}
 
+	}
+	
+	/** 
+	 * @param key - the column name / Map key
+	 * 
+	 * @return -1 if the key already exists, 1 if it adds the new key
+	 * */
+	public int addKeyName(String key) {
+		int status = 0;
+		if(keyNames.contains(key)) {
+			status = -1;
+		} else {
+			keyNames.add(key);
+			status = 1;
+		}
+		return status;
+	}
+	/** Creates a new map with all of the keys with "" as the string*/
+	public void addRow() {
+		HashMap<String, String> map = new HashMap<>();
+		for(String s : keyNames) {
+			// TODO: remove the 1 for production
+			map.put(s, "1");
+		}
+		data.add(map);
+	}
+	/**
+	 * removes key from keyNames, and iterates through this.data and removes key from all maps
+	 * 
+	 * @param key - the value to be removed
+	 *  */
+	public void removeKey(String key) {
+		keyNames.remove(key);
+		for(HashMap<String, String> map : this.data) {
+			if(map.containsKey(key)) {
+				map.remove(key);
+			}
+			
+		}
 	}
 
 }
