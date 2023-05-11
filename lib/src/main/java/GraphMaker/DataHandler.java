@@ -2,15 +2,20 @@ package GraphMaker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import javafx.collections.ObservableList;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 
 /**
  * TODO: figure out what to say here TODO: Make it so if you change the name of
  * a key value, it will go through all of the maps and update them. TODO: Make
  * keyCount and keyNames update correctly.
+ * 
+ * 
+ * Manages the data to be displayed in the table.
+ * 
+ * TODO: add the ability to write data to file.
+ * TODO: Make it correctly handle keyNames so they stay in sync.
+ * 
  * 
  */
 public class DataHandler {

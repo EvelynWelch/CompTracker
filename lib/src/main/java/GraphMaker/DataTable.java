@@ -1,36 +1,14 @@
 package GraphMaker;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-
-import javafx.application.Application;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.MapValueFactory;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.util.StringConverter;
-import javafx.collections.FXCollections;
-
-import javafx.util.Callback;
 
 /**
- * DataTable creates a JavaFX TableView, and manages its associated data.
+ * DataTable creates a JavaFX TableView, and manages its associated data with DataHandler.
  */
 public class DataTable {
 	TableView table;
@@ -52,10 +30,7 @@ public class DataTable {
 		this.columns = tableColumnFactory();
 		System.out.println("columns size(): " + this.columns.size());
 		this.table.getColumns().addAll(columns);
-//		for(int i = 0; i < this.columns.size(); i++) {
-//			this.table.getColumns().add(this.columns.get(i));
-//		}
-//		
+
 		System.out.println("table.getColumns().size(): " + this.table.getColumns().size());
 
 	}
@@ -89,34 +64,16 @@ public class DataTable {
 	 */
 	private ObservableList<TableColumn> tableColumnFactory() {
 
-		// Change the callback so it can take a Map.
-//		Callback<TableColumn<Map, String>, TableCell<Map, String>> cellFactoryForMap = new Callback<TableColumn<Map, String>, TableCell<Map, String>>() {
-//			@Override
-//			public TableCell call(TableColumn p) {
-//				return new TextFieldTableCell(new StringConverter() {
-//					@Override
-//					public String toString(Object t) {
-//						return t.toString();
-//					}
-//
-//					@Override
-//					public Object fromString(String string) {
-//						return string;
-//					}
-//				});
-//			}
-//		};
-
 		ObservableList<TableColumn> tableColumns = FXCollections.observableArrayList();
 		// gets the keyNames from DataHandler
 		ObservableList<String> keyNames = this.data.getKeyNames();
 
 		// loop through KeyNames and make all of the columns
 		for (int i = 0; i < keyNames.size(); i++) {
-			TableColumn<Map, String> column = new TableColumn<>(keyNames.get(i));	
+			TableColumn<Map, String> column = new TableColumn<>(keyNames.get(i));
 //			column.setCellValueFactory(new MapValueFactory<String>(keyNames.get(i)));
 			column.setCellValueFactory(new MapValueFactory<String>(keyNames.get(i)));
-			
+
 			tableColumns.add(column);
 		}
 
