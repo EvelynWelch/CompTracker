@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
@@ -24,6 +25,10 @@ import javafx.scene.text.Font;
  * TODO: Make it correctly handle keyNames so they stay in sync.
  * TODO: add data import and export
  * TODO: make the table editable.
+ * TODO: make it so you have rightclick option
+ *  	- select current column
+ *      - select current row
+ * 
  */
 
 public class App extends Application {
@@ -36,17 +41,19 @@ public class App extends Application {
 	public void start(Stage stage) {
 		Scene scene = new Scene(new Group());
 		stage.setTitle("Table View Sample");
-		stage.setWidth(300);
-		stage.setHeight(500);
+		stage.setWidth(750);
+		stage.setHeight(750);
 
 		final Label label = new Label("GraphMaker");
 		label.setFont(new Font("Arial", 20));
 
 		DataTable table = new DataTable();
 
+		HBox display = new HBox();
+		display.getChildren().addAll(table.getTableContainer(), ChartHandler.createLineChart());
+		
 
-
-		((Group) scene.getRoot()).getChildren().addAll(table.getTableContainer());
+		((Group) scene.getRoot()).getChildren().addAll(display);
 
 		stage.setScene(scene);
 

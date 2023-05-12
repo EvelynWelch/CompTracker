@@ -7,15 +7,19 @@ import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.control.TablePosition;
 
 /**
  * DataTable creates a JavaFX TableView, and manages its associated data with
@@ -38,10 +42,38 @@ public class DataTable {
 
 		this.table = new TableView<>(this.data.data);
 		this.table.setEditable(true);
-
-		table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		
+		// Add right click menu
+		ContextMenu rightClickMenu = new ContextMenu();
+		MenuItem selectRow = new MenuItem("Select row");
+		selectRow.setOnAction(e -> {
+			
+		});
+		
+		MenuItem selectColumn = new MenuItem("Select column");
+		selectColumn.setOnAction(e -> {
+			TablePosition tp = table.getFocusModel().getFocusedCell();
+			System.out.println("tableColumn: " + tp.getTableColumn().getText());
+			String tableKey = tp.getTableColumn().getText();
+			
+			int col = tp.getColumn();
+			System.out.println("column: " + this.data.getKeyNames().get(col));
+		});
+		rightClickMenu.getItems().addAll(selectRow, selectColumn);
+		this.table.setContextMenu(rightClickMenu);
+		
+		
+		
+		
+		table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		table.getSelectionModel().setCellSelectionEnabled(true);
-
+//		table.setOnMouseClicked(event -> {
+//			// if right click
+//			if(event.getButton() == MouseButton.SECONDARY) {
+//				
+//			}
+//			
+//		});
 		// creates columns from DataHandler.keyNames
 		tableColumnFactory();
 
@@ -61,13 +93,14 @@ public class DataTable {
 		
 		// Delete column functionality
 		// NOTE: this needs to be changed so you can select a column and delete it, not put the name in and hit the delete button
-		TextArea deleteColumnTa = new TextArea("test0");
+//		TextArea deleteColumnTa = new TextArea("test0");
 		Button deleteColumnBt = new Button("delete col");
 		deleteColumnBt.setOnAction(e -> {
 			// get the String from the text area
-			String toDelete = deleteColumnTa.getText();
-			this.data.removeKey(toDelete);
-			deleteColumnTa.setText("");
+			
+			TablePosition tp = table.getFocusModel().getFocusedCell();
+			System.out.println("tableColumn: " + tp.getTableColumn().getText());
+			String toDelete = tp.getTableColumn().getText();
 			TableColumn<Map, String> td = null;
 			ObservableList<TableColumn> columns = this.table.getColumns();
 			// loop through the columns looking for one thats text matches toDelete
@@ -82,7 +115,7 @@ public class DataTable {
 			
 		});
 		HBox deleteColumnHBox = new HBox();
-		deleteColumnHBox.getChildren().addAll(deleteColumnTa, deleteColumnBt);
+		deleteColumnHBox.getChildren().addAll(deleteColumnBt);
 		
 		
 		// Add row functionality
@@ -100,14 +133,10 @@ public class DataTable {
 		addRowHBox.getChildren().addAll(addRowBt, deleteRowBt);
 		
 		
-		
-		
-		
-		
 		tableContainer = new VBox();
 		tableContainer.setSpacing(5);
 		tableContainer.setPadding(new Insets(10, 0, 0, 10));
-		tableContainer.getChildren().addAll(this.getTable(), addColumnHBox, addRowHBox, deleteColumnHBox);
+		tableContainer.getChildren().addAll(this.getTable(), addColumnHBox, deleteColumnHBox, addRowHBox);
 	}
 
 	public DataTable(TableView table, DataHandler data) {
@@ -171,5 +200,12 @@ public class DataTable {
 	/** Adds a new Map to DataHandler.data */
 	private void addRow() {
 		this.data.addRow();
+	}
+	
+	/**
+	 * Manages the right click utility.
+	 *  */
+	private void clickEventHandler(MouseEvent event) {
+		
 	}
 }
