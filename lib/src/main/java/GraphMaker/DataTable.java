@@ -170,12 +170,10 @@ public class DataTable {
 	 * @param key - the name of the column / the value it is stored in the map
 	 */
 	public void addColumn(String key) {
-
 		this.data.addKeyName(key);
 		TableColumn<Map, String> newColumn = new TableColumn<>(key);
 		newColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		newColumn.setCellValueFactory(new MapValueFactory<String>(key));
-
 		newColumn.setOnEditCommit((CellEditEvent<Map, String> t) -> {
 			Map<String, String> map = ((Map<String, String>) t.getTableView().getItems().get(t.getTablePosition().getRow())); 
 			String initialValue = map.get(key);		
@@ -193,7 +191,6 @@ public class DataTable {
 //				System.out.println("running later");
 				map.put(key, map.get(key));
 			});
-			
 			// check if the row is graphed and if it is update it
 			int r = t.getTablePosition().getRow();
 			for (Object x : this.chart.getData()) {
@@ -256,7 +253,37 @@ public class DataTable {
 
 			this.chart.getData().add(ChartHandler.makeSeries(this.data.getData(), tableKey));
 		});
-		rightClickMenu.getItems().addAll(selectColumn);
+		MenuItem deleteColumn = new MenuItem("Delete column");
+		deleteColumn.setOnAction(e -> {
+			// get the String from the text area
+			TablePosition tp = table.getFocusModel().getFocusedCell();
+			System.out.println("tableColumn: " + tp.getTableColumn().getText());
+			String toDelete = tp.getTableColumn().getText();
+			TableColumn<Map, String> td = null;
+			ObservableList<TableColumn> columns = this.table.getColumns();
+			// loop through the columns looking for one thats text matches toDelete
+			for (TableColumn c : columns) {
+				if (c.getText().equals(toDelete)) {
+					td = c;
+					break;
+				}
+			}
+			// remove the column from columns
+			columns.remove(td);
+			this.data.removeKey(toDelete);
+			// update graph.
+			Platform.runLater(() -> {
+				for (Object x : this.chart.getData()) {
+					String n = ((Series) x).getName();
+					if (n.equals(toDelete)) {
+						this.chart.getData().remove(x);
+					}
+				}
+			});
+
+		});
+		
+		rightClickMenu.getItems().addAll(selectColumn, deleteColumn);
 		this.table.setContextMenu(rightClickMenu);
 	}
 }
